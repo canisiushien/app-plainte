@@ -16,6 +16,8 @@ import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -117,5 +119,19 @@ public class PlainteController {
     @GetMapping
     public ResponseEntity<List<PlainteDTO>> findAll() {
         return ResponseEntity.status(HttpStatus.OK).body(service.findAll());
+    }
+
+    /**
+     *
+     * @param idPlainte
+     * @return
+     */
+    @GetMapping(path = "/download/pieces/{idPlainte}")
+    public ResponseEntity<FileSystemResource> telechargerPiecesPlainte(@PathVariable(name = "idPlainte", required = true) Long idPlainte) {
+        FileSystemResource response = service.downloadPieces(idPlainte);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + response.getFilename() + "\"")
+                .body(response);
     }
 }

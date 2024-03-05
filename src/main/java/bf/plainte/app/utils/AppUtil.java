@@ -23,18 +23,22 @@ public class AppUtil {
     private static InputStream[] imagesStream = new InputStream[2];
 
     public static String TYPE_EXCEL = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-
     private static final String FR_SHORT_DATE_FORMAT = "dd/MM/yyyy";
 
     private static final DateFormat appFullMonthDateFormat = new SimpleDateFormat("dd MMMM yyyy", Locale.FRENCH);
-
     private static final DateFormat appShortDateFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.FRENCH);
 
+    public static final String appStoreRootPath = "/opt/app-plainte";
     public static final String DEFAULT_PASSWORD = "Def@ult%P@ssw0rd!.2@24";
 
     public static final String ROLE_ADMIN = "ADMIN";
-
     public static final String ROLE_USER = "USER";
+
+    // EXTENSIONS AUTORISEES
+    public static final String EXTENSION_PDF = ".pdf";
+    public static final String EXTENSION_PNG = ".png";
+    public static final String EXTENSION_JPG = ".jpg";
+    public static final String EXTENSION_JPEG = ".jpeg";
 
     /**
      * CONVERTIR DATE EN FORMAT : 18 mai 2023

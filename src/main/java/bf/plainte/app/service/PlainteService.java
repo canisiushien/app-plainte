@@ -8,6 +8,7 @@ package bf.plainte.app.service;
 import bf.plainte.app.dto.PlainteDTO;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -29,4 +30,6 @@ public interface PlainteService {
     List<PlainteDTO> findAll();
 
     String accuseReception(PlainteDTO plainteDTO);
+
+    FileSystemResource downloadPieces(Long idPlainte);
 }
