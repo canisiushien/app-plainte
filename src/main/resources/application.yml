@@ -1,0 +1,74 @@
+server:
+  port: 8099
+  
+spring:
+  application:
+    name: service-pdidata    
+    # endpoint de confirmation de creation de compte
+    domain:
+      url: http://localhost:4200
+    resources:
+      static-locations: classpath:/static/
+  jpa:
+    properties:
+      hibernate:
+        show_sql: false
+    hibernate:
+      ddl-auto: update
+      jdbc.lob.non_contextual_creation: true
+      default_schema: public
+  datasource:
+    platform: postgres 
+    url: jdbc:postgresql://localhost:5432/plaintedb
+    username: testOne 
+    password: testOne
+  mail:
+      protocol: smtp
+      host: smtp.gmail.com
+      port: 587
+      username: spconasur@gmail.com
+      password: lkqvjagwxghdjpjw
+      test-connection: false
+      properties:
+          mail:
+              smtp:
+                  ssl:
+                  trust: smtp.gmail.com
+                  auth: true
+                  starttls:
+                      enable: true
+  data:
+    web:
+      pageable:
+        default-page-size: 100
+    
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+jwt:
+  base64-secret: gy6FjjrA/lco3CQU3+KOyvdYSE4pE5p8qgSRckx+1aQoqAFmTVW7ZKoD7UWeg0WuAFEO7Xq+WEaSb4p/kk6jQg==
+  # Token is valid 24 hours
+  token-validity-in-seconds: 43200
+  token-validity-in-seconds-for-remember-me: 259200
+  token-confirm: 86400
+  token-reset: 86400
+  
+  springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui: #pour trier les chemins d'API dans l'ordre de leurs méthodes HTTP
+    operationsSorter: method
+---
+#log app
+logging:
+  level:
+    ROOT: INFO
+    bf.gov.conasur: 
+      - DEBUG
+      - INFO
+app:
+  openapi:
+    dev-url: http://localhost:8088
+    prod-url: https://localhost:8088
