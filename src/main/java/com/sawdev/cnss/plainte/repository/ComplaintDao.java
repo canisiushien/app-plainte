@@ -1,19 +1,22 @@
 package com.sawdev.cnss.plainte.repository;
 
+import com.sawdev.cnss.plainte.entity.Plainte;
+import com.sawdev.cnss.plainte.entity.User;
 import java.util.List;
-
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
-import com.sawdev.cnss.plainte.entities.Plainte;
-import com.sawdev.cnss.plainte.entities.User;
-
 @Repository
-public interface ComplaintDao extends CrudRepository<Plainte, Integer>{
+public interface ComplaintDao extends CrudRepository<Plainte, Long> {
 
-	public List<Plainte> findAll(Pageable pageable);
-	
-	public List<Plainte> findByCustomer(User user);
-	
+    public List<Plainte> findAll(Pageable pageable);
+
+    public List<Plainte> findByEmail(String customerEmail);
+
+    List<Plainte> findByPlaignant(User customer);
+
+    @Query("SELECT COUNT(p) FROM Plainte p WHERE YEAR(p.datePlainte) = :annee")
+    long countByAnnee(int annee);
 }

@@ -5,37 +5,33 @@
  */
 package com.sawdev.cnss.plainte.configuration;
 
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
-import io.swagger.v3.oas.models.servers.Server; 
+import io.swagger.v3.oas.models.servers.Server;
+import java.util.List;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
-
-/** 
+/**
  *
  * @author Aboubacary
  */
 @Configuration
 public class OpenAPIConfig {
-	
-	@Value("${app.openapi.dev-url}")
-	  private String devUrl;
-	
-	@Value("${app.openapi.prod-url}")
-	 private String prodUrl;
-	
- 
+
+    @Value("${app.openapi.dev-url}")
+    private String devUrl;
+
+    @Value("${app.openapi.prod-url}")
+    private String prodUrl;
+
     @Bean
-    public OpenAPI myOpenAPI() { 
-    	
-    	Server devServer = new Server();
+    public OpenAPI myOpenAPI() {
+
+        Server devServer = new Server();
         devServer.setUrl(devUrl);
         devServer.setDescription("Server URL in Development environment");
 
@@ -44,19 +40,19 @@ public class OpenAPIConfig {
         prodServer.setDescription("Server URL in Production environment");
 
         Contact contact = new Contact();
-        contact.setEmail("contact@conasur.gov.bf");
-        contact.setName("SP/CONASUR");
-        contact.setUrl("http://www.conasur.gov.bf");
+        contact.setEmail("contact@cnss.bf");
+        contact.setName("CNSS");
+        contact.setUrl("http://www.cnss.bf");
 
-        License appLicense = new License().name("MIT License").url("http://www.conasur.gov.bf");
+        License appLicense = new License().name("MIT License").url("http://www.cnss.bf");
 
         Info info = new Info()
-            .title("SERVICE-PDIDATA API REST")
-            .version("1.0")
-            .contact(contact)
-            .description("Swagger UI Integration for PDIDATA API REST.")
-            .termsOfService("http://www.conasur.gov.bf/terms")
-            .license(appLicense);
+                .title("CNSS-PLAINTE-API REST")
+                .version("1.0")
+                .contact(contact)
+                .description("Swagger UI Integration for CNSS-PLAINTE-API REST.")
+                .termsOfService("http://www.cnssbf/terms")
+                .license(appLicense);
 
         return new OpenAPI().info(info).servers(List.of(devServer, prodServer));
     }

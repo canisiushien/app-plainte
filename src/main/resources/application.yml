@@ -1,10 +1,11 @@
+## YAML Template.
+---
 server:
   port: 8099
   
 spring:
   application:
-    name: service-pdidata    
-    # endpoint de confirmation de creation de compte
+    name: CNSS-PLAINTE-API
     domain:
       url: http://localhost:4200
     resources:
@@ -20,8 +21,8 @@ spring:
   datasource:
     platform: postgres 
     url: jdbc:postgresql://localhost:5432/plaintedb
-    username: testOne 
-    password: testOne
+    username: postgres #testOne 
+    password: admin #testOne
   mail:
       protocol: smtp
       host: smtp.gmail.com
@@ -41,34 +42,26 @@ spring:
     web:
       pageable:
         default-page-size: 100
-    
+  springdoc:
+    api-docs:
+      path: /api-docs
+  swagger-ui:
+    operationsSorter: method
+  
 management:
   endpoints:
     web:
       exposure:
         include: "*"
-jwt:
-  base64-secret: gy6FjjrA/lco3CQU3+KOyvdYSE4pE5p8qgSRckx+1aQoqAFmTVW7ZKoD7UWeg0WuAFEO7Xq+WEaSb4p/kk6jQg==
-  # Token is valid 24 hours
-  token-validity-in-seconds: 43200
-  token-validity-in-seconds-for-remember-me: 259200
-  token-confirm: 86400
-  token-reset: 86400
-  
-  springdoc:
-  api-docs:
-    path: /api-docs
-  swagger-ui: #pour trier les chemins d'API dans l'ordre de leurs méthodes HTTP
-    operationsSorter: method
----
-#log app
+
 logging:
   level:
     ROOT: INFO
-    bf.gov.conasur: 
-      - DEBUG
+    com.sawdev.cnss.plainte: 
       - INFO
+      - DEBUG
+
 app:
   openapi:
-    dev-url: http://localhost:8088
-    prod-url: https://localhost:8088
+    dev-url: http://localhost:8099
+    prod-url: https://localhost:8099

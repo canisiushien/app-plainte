@@ -1,4 +1,4 @@
-package com.sawdev.cnss.plainte.entities;
+package com.sawdev.cnss.plainte.entity;
 
 import java.io.Serializable;
 import java.time.Instant;
