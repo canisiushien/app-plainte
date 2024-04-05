@@ -15,6 +15,10 @@ public interface ComplaintService {
 
     Plainte addNewComplaint(Plainte complaint);
 
+    Plainte updateComplaint(Plainte request);
+
+    Plainte nullify(Long idPlainte);
+
     void deleteComplaint(Long complaintId);
 
     List<Plainte> getAllComplaint();
@@ -28,6 +32,10 @@ public interface ComplaintService {
     void markAsInReview(Long complaintId);
 
     Plainte getComplaintById(Long complaintId);
+
+    List<Plainte> findByStatut(String statut);
+
+    String accuseReception(Plainte p);
 
     List<Plainte> getMyComplaintDetails();
 }

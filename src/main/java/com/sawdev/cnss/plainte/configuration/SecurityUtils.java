@@ -4,6 +4,10 @@
  */
 package com.sawdev.cnss.plainte.configuration;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.Stream;
 import org.springframework.security.core.Authentication;
@@ -17,6 +21,8 @@ import org.springframework.security.core.userdetails.UserDetails;
  * @author Canisius <canisiushien@gmail.com>
  */
 public final class SecurityUtils {
+
+    private static final DateFormat appShortDateFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.FRENCH);
 
     public SecurityUtils() {
     }
@@ -68,5 +74,15 @@ public final class SecurityUtils {
 
     private static Stream<String> getAuthorities(Authentication authentication) {
         return authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority);
+    }
+
+    /**
+     * CONVERTIR DATE EN FORMAT : 18-05-2023
+     *
+     * @param date
+     * @return
+     */
+    public static String convertDateToShort(Date date) {
+        return appShortDateFormat.format(date);
     }
 }

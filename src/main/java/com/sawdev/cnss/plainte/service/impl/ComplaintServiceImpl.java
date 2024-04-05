@@ -104,6 +104,17 @@ public class ComplaintServiceImpl implements ComplaintService {
         return complaintDao.save(c);
     }
 
+    @Override
+    public String accuseReception(Plainte p) {
+        return "Cher " + (p.getPlaignant() != null ? p.getPlaignant() : "Collaborateur") + ",<br />"
+                + "Nous accusons réception de votre plainte en date du " + (p.getDatePlainte() != null ? SecurityUtils.convertDateToShort(p.getDatePlainte()) : "INCONNUE") + ".<br />"
+                + "Elle a été enregistrée sous le numéro de référence <b>" + p.getNumero() + "</b>.<br />"
+                + "Nous nous efforçons de résoudre toutes les plaintes dans les plus brefs délais.<br />"
+                + "Vous recevrez une réponse détaillée concernant votre plainte d'ici 3 jours ouvrables. Si nous avons besoin de plus de temps pour résoudre votre plainte, nous vous en informerons.<br /><br />"
+                + "Cordialement,<br /><br />"
+                + "L'équipe de gestion.";
+    }
+
     private String generateNumero() {
         // generation du code/reference de la declaration
         Calendar myCalendar = new GregorianCalendar();
@@ -111,6 +122,28 @@ public class ComplaintServiceImpl implements ComplaintService {
         long count = complaintDao.countByAnnee(myCalendar.get(Calendar.YEAR));
 
         return "P-" + myCalendar.get(Calendar.YEAR) + "-" + (count + 1);
+    }
+
+    @Override
+    public Plainte updateComplaint(Plainte request) {
+        log.info("mise a jour d'une plainte. data : {}", request);
+        Plainte plainte = complaintDao.findById(request.getId()).orElseThrow(() -> new RuntimeException("Vous tentez de modifier une plainte qui n'existe pas."));
+        if (plainte.getStatut() != EStatut.INITIAL) {
+            throw new RuntimeException("Opération impossible ! la plainte est déjà traitée ou abandonnée.");
+        }
+        plainte.setDetails(request.getDetails());
+        return complaintDao.save(plainte);
+    }
+
+    @Override
+    public Plainte nullify(Long idPlainte) {
+        log.info("annulation d'une plainte. data : {}", idPlainte);
+        Plainte plainte = complaintDao.findById(idPlainte).orElseThrow(() -> new RuntimeException("Vous tentez d'annuler une plainte qui n'existe pas."));
+        if (plainte.getStatut() != EStatut.INITIAL) {
+            throw new RuntimeException("Opération impossible ! la plainte est déjà traitée ou abandonnée.");
+        }
+        plainte.setStatut(EStatut.ABANDONNE);
+        return complaintDao.save(plainte);
     }
 
     //getting all complaints list 
@@ -143,11 +176,17 @@ public class ComplaintServiceImpl implements ComplaintService {
         return complaintDao.findById(complaintId).get();
     }
 
+    @Override
+    public List<Plainte> findByStatut(String statut) {
+        log.info("liste des plaintes par statut : {}", statut);
+        return complaintDao.findByStatut(EStatut.valueOf(statut));
+    }
+
     public List<Plainte> getMyComplaintDetails() {
         log.info("Liste des plaintes du user courant");
         String currentUsername = SecurityUtils.getCurrentUserUsername().get();// will get the current username
-        System.out.println("________________ currentUsername : " + currentUsername);
         User user = userDao.findOneByUsername(currentUsername).get(); // by this we will get all the userdetails
         return complaintDao.findByPlaignant(user);
     }
+
 }
