@@ -4,6 +4,7 @@
  */
 package com.sawdev.cnss.plainte.service;
 
+import com.sawdev.cnss.plainte.dto.PasswordModif;
 import com.sawdev.cnss.plainte.entity.User;
 import java.util.List;
 
@@ -22,6 +23,14 @@ public interface UserService {
 
     User registerNewManager(User manager);
 
+    String resetPassword(String to);
+
+    String changeUserPassword(PasswordModif passwordModif);
+
+    List<User> getAllUsers();
+
+    void deleteUser(String userName);
+
     String forAdmin();
 
     String forManager();
@@ -29,9 +38,5 @@ public interface UserService {
     String forCustomer();
 
     String forEngineer();
-
-    List<User> getAllUsers();
-
-    void deleteUser(String userName);
 
 }

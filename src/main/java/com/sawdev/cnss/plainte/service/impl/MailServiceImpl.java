@@ -39,7 +39,7 @@ public class MailServiceImpl implements MailService {
         try {
             helper.setTo(to);
             helper.setSubject(subject);
-            InternetAddress fromAddress = new InternetAddress("no_reply@plainte.org", "VOTRE PLAINTE");
+            InternetAddress fromAddress = new InternetAddress("no_reply@plainte.org", "CNSS-PLAINTE");
             helper.setReplyTo(fromAddress);
             helper.setFrom(fromAddress);
             helper.setText(body, true);

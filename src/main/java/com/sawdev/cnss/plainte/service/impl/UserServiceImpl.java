@@ -1,9 +1,13 @@
 package com.sawdev.cnss.plainte.service.impl;
 
+import com.sawdev.cnss.plainte.configuration.JWTUtils;
+import com.sawdev.cnss.plainte.dto.PasswordModif;
 import com.sawdev.cnss.plainte.entity.User;
 import com.sawdev.cnss.plainte.repository.UserDao;
+import com.sawdev.cnss.plainte.service.MailService;
 import com.sawdev.cnss.plainte.service.UserService;
 import java.util.List;
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -17,7 +21,13 @@ public class UserServiceImpl implements UserService {
     private UserDao userdao;
 
     @Autowired
+    private MailService mailService;
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private JWTUtils jwtUtils;
 
     @Override
     public void deleteUser(String userName) {
@@ -56,10 +66,60 @@ public class UserServiceImpl implements UserService {
         return userdao.save(manager);
     }
 
+    public String resetPassword(final String to) {
+        User optionalUser = userdao.findOneByEmail(to).orElse(null);
+
+        if (optionalUser == null) {
+            throw new RuntimeException("Le compte avec l'adresse mail " + to + " n'existe pas");
+        }
+
+        if (!optionalUser.isEnabled()) {
+            throw new RuntimeException("Le compte avec l'adresse mail " + to + " n'est pas encore validé");
+        }
+
+        String defaultPassword = UUID.randomUUID().toString();
+        String emailSubject = "Demande de réinitialisation de mot de passe";
+        String emailBody = "Veuillez recevoir ci-dessous un mot de passe généré aléatoirement pour acceder à votre compte. <br>Mot de passe généré : " + defaultPassword;
+
+        optionalUser.setPassword(this.getEncodedPassword(defaultPassword));
+        userdao.save(optionalUser);
+        if (mailService.isEmailValid(to)) {
+            mailService.sendEmail(to, emailSubject, emailBody);
+        } else {
+            throw new RuntimeException("L'email de l'utilisateur n'est pas valide.");
+        }
+        return "Lien de réinitialisation de mot de passe envoyé";
+    }
+
+    public String changeUserPassword(final PasswordModif passwordModif) {
+        User optionalUser = userdao.findOneByUsername(jwtUtils.extractUsername(passwordModif.getToken())).orElse(null);
+        if (optionalUser == null) {
+            throw new RuntimeException("Le token n'est pas valide. Il correspond à aucun utilisateur.");
+        }
+        if (jwtUtils.isTokenExpired(passwordModif.getToken())) {
+            throw new RuntimeException("Le token a expiré.");
+        }
+
+        if (!passwordModif.getNewPassword().equals(passwordModif.getConfirmNewPassword())) {
+            throw new RuntimeException("Les deux mots de passe ne sont pas identiques.");
+        }
+
+        optionalUser.setPassword(this.getEncodedPassword(passwordModif.getNewPassword()));
+        userdao.save(optionalUser);
+        //VIDER LA CACHE ET EXPIRE DE FORCE LE TOKEN FOURNI EN PARAMS
+        return "Le mot de passe a été changé";
+    }
+
+    @Override
+    public List<User> getAllUsers() {
+        log.info("Liste des comptes utilisateur");
+        return userdao.findAll();
+    }
+
     @Override
     public void initUsers() {
-        log.info("Creation de comptes utilisateur systeme");
         if (userdao.count() < 2) {
+            log.info("Creation de comptes utilisateur systeme");
             User adminUser = new User();
             adminUser.setNom("admin");
             adminUser.setPrenom("admin123");
@@ -103,11 +163,6 @@ public class UserServiceImpl implements UserService {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
-    @Override
-    public List<User> getAllUsers() {
-        log.info("Liste des comptes utilisateur");
-        return userdao.findAll();
-    }
 }
 
 /*

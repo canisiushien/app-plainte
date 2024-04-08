@@ -4,6 +4,7 @@
  */
 package com.sawdev.cnss.plainte.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -42,6 +43,7 @@ public class User implements UserDetails {
 
     private String telephone;
 
+    @JsonIgnore
     private String password;
 
     @Column(unique = true, nullable = false)

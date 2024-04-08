@@ -98,15 +98,17 @@ public class ComplaintServiceImpl implements ComplaintService {
     //adding new complaint feature for customer
     public Plainte addNewComplaint(Plainte c) {
         log.info("ajout d'une nouvelle plainte : {}", c);
+        User plaignant = userDao.findById(c.getPlaignant().getId()).orElseThrow(() -> new RuntimeException("Plaignant non identifé."));
         c.setStatut(EStatut.INITIAL);
         c.setDatePlainte(new Date());
         c.setNumero(this.generateNumero());
+        c.setPlaignant(plaignant);
         return complaintDao.save(c);
     }
 
     @Override
     public String accuseReception(Plainte p) {
-        return "Cher " + (p.getPlaignant() != null ? p.getPlaignant() : "Collaborateur") + ",<br />"
+        return "Cher " + (p.getPlaignant() != null ? p.getPlaignant().getPrenom() + " " + p.getPlaignant().getNom() : "Collaborateur") + ",<br />"
                 + "Nous accusons réception de votre plainte en date du " + (p.getDatePlainte() != null ? SecurityUtils.convertDateToShort(p.getDatePlainte()) : "INCONNUE") + ".<br />"
                 + "Elle a été enregistrée sous le numéro de référence <b>" + p.getNumero() + "</b>.<br />"
                 + "Nous nous efforçons de résoudre toutes les plaintes dans les plus brefs délais.<br />"

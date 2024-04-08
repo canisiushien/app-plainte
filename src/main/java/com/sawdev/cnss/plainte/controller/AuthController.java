@@ -45,7 +45,8 @@ public class AuthController {
      */
     @PostMapping("/signin")
     public ResponseEntity<AuthResponse> signIn(@RequestBody AuthRequest request) {
-        return ResponseEntity.ok().body(authService.signIn(request));
+        AuthResponse response = authService.signIn(request);
+        return ResponseEntity.ok().header("Authorization", "Bearer " + response.getToken()).body(response);
     }
 
     /**
