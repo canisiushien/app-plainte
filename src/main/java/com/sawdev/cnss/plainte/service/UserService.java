@@ -5,7 +5,9 @@
 package com.sawdev.cnss.plainte.service;
 
 import com.sawdev.cnss.plainte.dto.PasswordModif;
-import com.sawdev.cnss.plainte.entity.User;
+import com.sawdev.cnss.plainte.dto.UserDTO;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -14,20 +16,26 @@ import java.util.List;
  */
 public interface UserService {
 
-//    void initRoles();
-    void initUsers();
+    void saveInitAuthorities() throws FileNotFoundException, IOException;
 
-    User registerNewUser(User customer);
+    void saveInitProfil();
 
-    User registerNewEngineer(User engg);
+    void saveInitUser();
 
-    User registerNewManager(User manager);
+    UserDTO registerNewUser(UserDTO customer);
 
+    UserDTO registerNewInterneUser(UserDTO userDTO);
+
+    String resendPassword(String email);
+
+//    User registerNewEngineer(User engg);
+//
+//    User registerNewManager(User manager);
     String resetPassword(String to);
 
     String changeUserPassword(PasswordModif passwordModif);
 
-    List<User> getAllUsers();
+    List<UserDTO> getAllUsers();
 
     void deleteUser(String userName);
 

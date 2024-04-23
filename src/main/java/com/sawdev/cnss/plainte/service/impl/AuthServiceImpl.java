@@ -7,14 +7,18 @@ package com.sawdev.cnss.plainte.service.impl;
 import com.sawdev.cnss.plainte.configuration.JWTUtils;
 import com.sawdev.cnss.plainte.dto.AuthRequest;
 import com.sawdev.cnss.plainte.dto.AuthResponse;
+import com.sawdev.cnss.plainte.entity.Privilege;
 import com.sawdev.cnss.plainte.entity.User;
+import com.sawdev.cnss.plainte.exception.CustomException;
 import com.sawdev.cnss.plainte.repository.UserDao;
 import com.sawdev.cnss.plainte.service.AuthService;
 import java.util.HashMap;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -46,13 +50,14 @@ public class AuthServiceImpl implements AuthService {
      */
     public User signUp(User user) {
         log.info("Creation de compte utilisateur : {}", user);
-        try {
-            user.setPassword(passwordEncoder.encode(user.getPassword()));
-            user = userDao.save(user);
-            return user;
-        } catch (Exception e) {
-            throw new RuntimeException("Erreur survenue lors de la création de compte utilisateur.");
-        }
+        throw new UnsupportedOperationException("Not implemented yet.");
+//        try {
+//            user.setPassword(passwordEncoder.encode(user.getPassword()));
+//            user = userDao.save(user);
+//            return user;
+//        } catch (Exception e) {
+//            throw new RuntimeException("Erreur survenue lors de la création de compte utilisateur.");
+//        }
     }
 
     /**
@@ -65,20 +70,31 @@ public class AuthServiceImpl implements AuthService {
         log.info("Authentification de l'utilisateur : {}", authRequest.getUsername());
         AuthResponse response = new AuthResponse();
 
-        try {
-            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
-            User user = userDao.findOneByUsername(authRequest.getUsername()).orElseThrow();
+        User user = userDao.findOneByUsername(authRequest.getUsername()).orElseThrow(() -> new CustomException("Les informations d'authentification sont erronées."));
+        String currentEncryptedPassword = user.getPassword();
+        if (!passwordEncoder.matches(authRequest.getPassword(), currentEncryptedPassword)) {
+            throw new CustomException("Les informations d'authentification sont erronées.");
+        }
+        if (!user.isEnabled()) {
+            throw new CustomException("Le compte " + authRequest.getUsername() + " n'est pas actif.");
+        }
+
+        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
+        if (authentication.isAuthenticated()) {
             String jwt = jWTUtils.generateToken(user);
             String refreshToken = jWTUtils.generateRefreshToken(new HashMap<>(), user);
             response.setStatusCode(200);
             response.setToken(jwt);
             response.setRefreshToken(refreshToken);
-            response.setExpirartionTime("24Hrs");
-            response.setRole(user.getRole());
+            response.setExpirationTime(jWTUtils.extractExpirationDate(jwt).toString());
+            //A voir si vraiment necessaire de charger les roles
+            response.setRoles(user.getProfile().getPrivileges().stream()
+                    .map(Privilege::getCode)
+                    .collect(Collectors.toSet()));
             response.setMessage(user.getUsername() + " authentifié avec succès.");
-        } catch (Exception e) {
+        } else {
             response.setStatusCode(500);
-            response.setMessage("Données d'authentification erronnées");
+            response.setMessage("Echec d'authentification.");
         }
         return response;
     }
@@ -98,7 +114,7 @@ public class AuthServiceImpl implements AuthService {
             response.setStatusCode(200);
             response.setToken(jwt);
             response.setRefreshToken(token);
-            response.setExpirartionTime("24Hrs");
+            response.setExpirationTime(jWTUtils.extractExpirationDate(jwt).toString());
             response.setMessage("Token rafraichi avec succès.");
         }
         response.setStatusCode(500);

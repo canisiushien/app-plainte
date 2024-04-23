@@ -5,6 +5,7 @@ import com.sawdev.cnss.plainte.entity.Plainte;
 import com.sawdev.cnss.plainte.entity.Traitement;
 import com.sawdev.cnss.plainte.entity.User;
 import com.sawdev.cnss.plainte.enums.EStatut;
+import com.sawdev.cnss.plainte.exception.CustomException;
 import com.sawdev.cnss.plainte.repository.ComplaintDao;
 import com.sawdev.cnss.plainte.repository.TraitementDao;
 import com.sawdev.cnss.plainte.repository.UserDao;
@@ -98,7 +99,7 @@ public class ComplaintServiceImpl implements ComplaintService {
     //adding new complaint feature for customer
     public Plainte addNewComplaint(Plainte c) {
         log.info("ajout d'une nouvelle plainte : {}", c);
-        User plaignant = userDao.findById(c.getPlaignant().getId()).orElseThrow(() -> new RuntimeException("Plaignant non identifé."));
+        User plaignant = userDao.findById(c.getPlaignant().getId()).orElseThrow(() -> new CustomException("Plaignant non identifé."));
         c.setStatut(EStatut.INITIAL);
         c.setDatePlainte(new Date());
         c.setNumero(this.generateNumero());
@@ -129,9 +130,9 @@ public class ComplaintServiceImpl implements ComplaintService {
     @Override
     public Plainte updateComplaint(Plainte request) {
         log.info("mise a jour d'une plainte. data : {}", request);
-        Plainte plainte = complaintDao.findById(request.getId()).orElseThrow(() -> new RuntimeException("Vous tentez de modifier une plainte qui n'existe pas."));
+        Plainte plainte = complaintDao.findById(request.getId()).orElseThrow(() -> new CustomException("Vous tentez de modifier une plainte qui n'existe pas."));
         if (plainte.getStatut() != EStatut.INITIAL) {
-            throw new RuntimeException("Opération impossible ! la plainte est déjà traitée ou abandonnée.");
+            throw new CustomException("Opération impossible ! la plainte est déjà traitée ou abandonnée.");
         }
         plainte.setDetails(request.getDetails());
         return complaintDao.save(plainte);
@@ -140,9 +141,9 @@ public class ComplaintServiceImpl implements ComplaintService {
     @Override
     public Plainte nullify(Long idPlainte) {
         log.info("annulation d'une plainte. data : {}", idPlainte);
-        Plainte plainte = complaintDao.findById(idPlainte).orElseThrow(() -> new RuntimeException("Vous tentez d'annuler une plainte qui n'existe pas."));
+        Plainte plainte = complaintDao.findById(idPlainte).orElseThrow(() -> new CustomException("Vous tentez d'annuler une plainte qui n'existe pas."));
         if (plainte.getStatut() != EStatut.INITIAL) {
-            throw new RuntimeException("Opération impossible ! la plainte est déjà traitée ou abandonnée.");
+            throw new CustomException("Opération impossible ! la plainte est déjà traitée ou abandonnée.");
         }
         plainte.setStatut(EStatut.ABANDONNE);
         return complaintDao.save(plainte);

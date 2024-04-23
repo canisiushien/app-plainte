@@ -1,0 +1,11 @@
+id;code;libelle
+1;ADMIN;Administrateur
+2;ADD_PROFILE;Ajouter un profile
+3;VIEW_PROFILE;Afficher les profiles
+4;DELETE_PROFILE;Supprimer un profile
+5;ADD_USER;Ajouter un utilisateur
+6;VIEW_USER;Afficher les utilisateurs
+7;ADD_PLAINTE;Ajouter une plainte
+8;EDIT_PLAINTE;Modifier une plainte
+9;VIEW_PLAINTE;Afficher les plaintes
+10;DELETE_PLAINTE;Supprimer une plainte

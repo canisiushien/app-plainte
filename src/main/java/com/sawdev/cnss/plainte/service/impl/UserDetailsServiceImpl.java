@@ -5,6 +5,7 @@
 package com.sawdev.cnss.plainte.service.impl;
 
 import com.sawdev.cnss.plainte.entity.User;
+import com.sawdev.cnss.plainte.exception.CustomException;
 import com.sawdev.cnss.plainte.repository.UserDao;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +32,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         log.info("Recherche de compte utilisateur : {}", username);
         User user = userDao.findOneByUsername(username).get();
         if (!user.isEnabled()) {
-            throw new RuntimeException("L'utilisateur " + username + " est désactivé.");
+            throw new CustomException("L'utilisateur " + username + " est désactivé.");
         }
         if (user != null) {
             return new org.springframework.security.core.userdetails.User(

@@ -10,6 +10,7 @@ spring:
       url: http://localhost:4200
     resources:
       static-locations: classpath:/static/
+  main.allow-circular-references: true
   jpa:
     properties:
       hibernate:
@@ -57,9 +58,9 @@ management:
 logging:
   level:
     ROOT: INFO
-    com.sawdev.cnss.plainte: 
-      - INFO
-      - DEBUG
+    com.sawdev.cnss.plainte: INFO
+    com.sawdev.cnss.plainte.GlobalExceptionHandler: ERROR
+    org.springframework.security: DEBUG
 
 app:
   openapi:

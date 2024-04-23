@@ -1,10 +1,8 @@
 package com.sawdev.cnss.plainte.controller;
 
 import com.sawdev.cnss.plainte.dto.PasswordModif;
-import com.sawdev.cnss.plainte.entity.User;
-import com.sawdev.cnss.plainte.repository.UserDao;
+import com.sawdev.cnss.plainte.dto.UserDTO;
 import com.sawdev.cnss.plainte.service.UserService;
-import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,26 +21,58 @@ public class UserController {
     @Autowired
     private UserService userservice;
 
-    @Autowired
-    private UserDao userDao;
-
+    /**
+     * un usager simple créer son propre compte avec son password directement
+     * associé. On lui associera en arriere plan le profile CUSTOMER qui sera
+     * parametré
+     *
+     * @param customer
+     * @return
+     */
     @PostMapping({"/public/registerNewCustomer"})
-    public User RegisterNewUser(@RequestBody User customer) {
-        return userservice.registerNewUser(customer);
+    public ResponseEntity<?> registerNewUser(@RequestBody UserDTO customer) {
+        return new ResponseEntity<>(userservice.registerNewUser(customer), HttpStatus.CREATED);
     }
 
-    //for admin to register new engineer
-    //@PreAuthorize("hasRole('Admin')")
-    @PostMapping({"/admin/registerNewEngineer"})
-    public User RegisterNewEngineer(@RequestBody User engg) {
-        return userservice.registerNewEngineer(engg);
+    /**
+     * L'admin peut creer tout autre user (manager, engineer, ...) avec un
+     * quelconque profile parametré à l'avance. le password est aléatoirement
+     * generé en envoyé par mail directement au propriétaire du nouveau compte
+     *
+     * @param userDTO
+     * @return
+     */
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
+    @PostMapping({"/registerNewUser"})
+    public ResponseEntity<?> registerNewInterneUser(@RequestBody UserDTO userDTO) {
+        return new ResponseEntity<>(userservice.registerNewInterneUser(userDTO), HttpStatus.CREATED);
     }
 
-    //for admin to register new manager
-    @PostMapping({"/admin/registerNewManager"})
-    public User RegisterNewManager(@RequestBody User manager) {
-        return userservice.registerNewManager(manager);
+    /**
+     * L'admin peut renvoyer un mot géneré aléatoirement par mail à un user
+     *
+     * @param email: l'email du user à qui on renvoie le password
+     * @return
+     */
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
+    @GetMapping({"/resend-password/{email}"})
+    public ResponseEntity<?> renvoyerPassword(@PathVariable String email) {
+        return new ResponseEntity<>(userservice.resendPassword(email), HttpStatus.OK);
     }
+//    
+//    //for admin to register new engineer
+//    @PreAuthorize("hasAnyAuthority('ADMIN')")
+//    @PostMapping({"/registerNewEngineer"})
+//    public User RegisterNewEngineer(@RequestBody User engg) {
+//        return userservice.registerNewEngineer(engg);
+//    }
+//
+//    //for admin to register new manager
+//    @PreAuthorize("hasAnyAuthority('ADMIN')")
+//    @PostMapping({"/registerNewManager"})
+//    public User RegisterNewManager(@RequestBody User manager) {
+//        return userservice.registerNewManager(manager);
+//    }
 
     /**
      * Reinitialisation de password oublié
@@ -62,21 +92,22 @@ public class UserController {
      * @param passwordModif
      * @return
      */
-    @PostMapping("/customer/change-user-password")
+    @PostMapping("/change-user-password")
     public ResponseEntity<String> changeUserPassword(final @RequestBody PasswordModif passwordModif) {
         return new ResponseEntity<>(userservice.changeUserPassword(passwordModif), HttpStatus.OK);
     }
 
-    //@PreAuthorize("hasRole('Admin')")
-    @GetMapping("/admin/allUser")
-    public List<User> getAllUsers() {
-        return (List<User>) userDao.findAll();
+    @GetMapping("/allUser")
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
+    public ResponseEntity<?> getAllUsers() {
+        return new ResponseEntity<>(userservice.getAllUsers(), HttpStatus.OK);
     }
 
-    // @PreAuthorize("hasRole('Admin')")
-    @DeleteMapping("/admin/deleteUser/{userName}")
-    public void deleteUser(@PathVariable String userName) {
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
+    @DeleteMapping("/deleteUser/{userName}")
+    public ResponseEntity<?> deleteUser(@PathVariable String userName) {
         userservice.deleteUser(userName);
+        return new ResponseEntity<>("Suppression réussie.", HttpStatus.NO_CONTENT);
     }
 
     @GetMapping({"/forAdmin"})

@@ -4,6 +4,7 @@
  */
 package com.sawdev.cnss.plainte.dto;
 
+import java.util.Set;
 import lombok.Data;
 
 /**
@@ -21,7 +22,15 @@ public class AuthResponse {
 
     private String refreshToken;
 
-    private String expirartionTime;
+    private String expirationTime;
 
-    private String role;
+    private Set<String> roles;
+
+    public AuthResponse() {
+    }
+
+    public AuthResponse(int statusCode, String message) {
+        this.statusCode = statusCode;
+        this.message = message;
+    }
 }

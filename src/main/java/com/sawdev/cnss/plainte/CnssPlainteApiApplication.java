@@ -5,7 +5,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cache.annotation.EnableCaching;
 
+@EnableCaching
 @SpringBootApplication
 public class CnssPlainteApiApplication implements CommandLineRunner {
 
@@ -18,7 +20,9 @@ public class CnssPlainteApiApplication implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        userservice.initUsers();
+        userservice.saveInitAuthorities();
+        userservice.saveInitProfil();
+        userservice.saveInitUser();
     }
 
 }

@@ -13,6 +13,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -31,6 +32,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
  */
 @Configuration
 @EnableWebSecurity
+@EnableGlobalMethodSecurity(prePostEnabled = true)//active l'usage du @PreAuthorize
 public class SecurityConfig {
 
     @Autowired
@@ -45,15 +47,10 @@ public class SecurityConfig {
                 .authorizeHttpRequests(request -> request.requestMatchers("/auth/**", "/public/**").permitAll()
                 .requestMatchers("/swagger-ui/**").permitAll()
                 .requestMatchers("/api-docs").permitAll()
-                .requestMatchers("/admin/**").hasAnyAuthority("ADMIN")
-                .requestMatchers("/manager/**").hasAnyAuthority("MANAGER", "ADMIN")
-                .requestMatchers("/engineer/**").hasAnyAuthority("ENGINEER", "ADMIN")
-                .requestMatchers("/customer/**").hasAnyAuthority("CUSTOMER", "ADMIN", "MANAGER", "ENGINEER")
                 .anyRequest().authenticated())
                 .sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider()).addFilterBefore(
-                jWTAuthFilter, UsernamePasswordAuthenticationFilter.class
-        );
+                jWTAuthFilter, UsernamePasswordAuthenticationFilter.class);
         return httpSecurity.build();
     }
 

@@ -77,6 +77,16 @@ public class JWTUtils {
         return this.extractClaims(token, Claims::getSubject);
     }
 
+    /**
+     * Extraire la date d'expiration du token
+     *
+     * @param token
+     * @return
+     */
+    public Date extractExpirationDate(String token) {
+        return this.extractClaims(token, Claims::getExpiration);
+    }
+
     private <T> T extractClaims(String token, Function<Claims, T> claimsTFunction) {
         return claimsTFunction.apply(Jwts.parser().verifyWith(key).build().parseSignedClaims(token).getPayload());
     }
